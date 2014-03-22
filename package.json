@@ -1,0 +1,41 @@
+{
+  "name": "IdeaMap",
+  "version": "0.0.0",
+  "description": "IdeaMap =======",
+  "main": "Gruntfile.js",
+  "directories": {
+    "doc": "doc"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/narusas/IdeaMap.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/narusas/IdeaMap/issues"
+  },
+  "homepage": "https://github.com/narusas/IdeaMap",
+  "devDependencies": {
+    "grunt": "^0.4.2",
+    "grunt-contrib-uglify": "^0.4.0",
+    "grunt-contrib-jshint": "^0.8.0",
+    "grunt-contrib-qunit": "^0.4.0",
+    "grunt-contrib-watch": "^0.5.3",
+    "grunt-contrib-concat": "^0.3.0",
+    "grunt-jasmine-runner": "^0.6.0",
+    "underscore": "^1.6.0",
+    "qunitjs": "^1.14.0",
+    "grunt-qunit-amd": "^0.1.1",
+    "grunt-contrib-requirejs": "^0.4.3",
+    "bower": "^1.2.8",
+    "grunt-bower-requirejs": "^0.9.0",
+    "grunt-bower-task": "^0.3.4"
+  },
+  "dependencies": {
+    "bower-requirejs": "^0.10.0"
+  }
+}

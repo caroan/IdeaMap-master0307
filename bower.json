@@ -1,0 +1,25 @@
+{
+  "name": "IdeaMap",
+  "version": "0.0.0",
+  "homepage": "https://github.com/narusas/IdeaMap",
+  "authors": [
+    "narusas <narusas@gmail.com>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "main": "aa",
+  "dependencies": {
+    "paper": "~0.9.15",
+    "qunit": "~1.14.0",
+    "requirejs": "~2.1.11",
+    "underscore": "~1.6.0",
+    "underscore.string": "~2.3.3",
+    "straps": "~1.4.3"
+  }
+}

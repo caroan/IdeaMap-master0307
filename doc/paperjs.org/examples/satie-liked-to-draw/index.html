@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" >
+  <meta charset="UTF-8"/>
+  <link rel="stylesheet" href="../../assets/css/style.css"/>
+  <link rel="icon" href="../../assets/favicon.ico" type="image/x-icon"/>
+  <link rel="shortcut icon" href="../../assets/favicon.ico"/>
+  <script src="../../assets/js/jquery.js"></script>
+  <script src="../../assets/js/paper.js"></script>
+  <script src="../../assets/js/codemirror.js"></script>
+  <script src="../../assets/js/scripts.js"></script>
+  <script>
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-10082945-6']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+  <title>Paper.js - Paper.js</title>
+</head>
+  <body class="fullscreen">
+    <nav>
+      <h1><a href="../../index.html">Paper.js</a></h1>
+<ul>
+  <li><a href="../../about/index.html">About</a></li>
+  <li><a href="../../features/index.html">Features</a></li>
+  <li class="spacer"></li>
+  <li><a href="../index.html">Examples</a>
+<ul>
+  <li class="active"><a href="index.html">Satie Liked To Draw</a></li>
+  <li><a href="../chain/index.html">Chain</a></li>
+  <li><a href="../tadpoles/index.html">Tadpoles</a></li>
+  <li><a href="../nyan-rainbow/index.html">Nyan Rainbow</a></li>
+  <li><a href="../rounded-rectangles/index.html">Rounded Rectangles</a></li>
+  <li><a href="../radial-rainbows/index.html">Radial Rainbows</a></li>
+  <li><a href="../meta-balls/index.html">Meta Balls</a></li>
+  <li><a href="../voronoi/index.html">Voronoi</a></li>
+  <li><a href="../future-splash/index.html">Future Splash</a></li>
+  <li><a href="../smoothing/index.html">Smoothing</a></li>
+  <li><a href="../spiral-raster/index.html">Spiral Raster</a></li>
+  <li><a href="../division-raster/index.html">Division Raster</a></li>
+  <li><a href="../q-bertify/index.html">Q-bertify</a></li>
+  <li><a href="../path-intersections/index.html">Path Intersections</a></li>
+  <li><a href="../path-simplification/index.html">Path Simplification</a></li>
+  <li><a href="../hit-testing/index.html">Hit Testing</a></li>
+  <li><a href="../bouncing-balls/index.html">Bouncing Balls</a></li>
+</ul></li>
+  <li><a href="../../showcase/index.html">Showcase</a></li>
+  <li class="spacer"></li>
+  <li><a href="../../tutorials/index.html">Tutorials</a></li>
+  <li><a href="../../reference/index.html">Reference</a></li>
+  <li><a href="http://sketch.paperjs.org/">Sketch</a></li>
+  <li class="spacer"></li>
+  <li><a href="../../download/index.html">Download</a></li>
+  <li><a href="../../donation/index.html">Donation</a></li>
+  <li><a href="../../license/index.html">License</a></li>
+  <li class="spacer"></li>
+  <li><a href="http://groups.google.com/group/paperjs" target="_blank">Mailing List</a></li>
+  <li><a href="http://twitter.com/PaperJS" target="_blank">Follow on Twitter</a></li>
+  <li><a href="http://github.com/paperjs/paper.js" target="_blank">Watch on Github</a></li>
+</ul>
+    </nav>
+<article><div class="paperscript">
+<div class="buttons">
+<div class="button run">Source</div>
+<div class="explain"></div>
+</div>
+<script type="text/paperscript" canvas="canvas-1">
+var leftPath = new Path({
+    strokeColor: 'red',
+	opacity: 0.5
+});
+
+var rightPath = new Path({
+	strokeColor: 'green',
+	opacity: 0.5
+});
+
+var amount = 8;
+var step = view.size.width / (amount + 1);
+var flip = true;
+
+for (var i = 0; i <= amount; i++) {
+	leftPath.add(new Point(i * step, 0));
+	rightPath.add(new Point(i * step, 0));
+}
+
+var group = new Group({
+	children: [leftPath, rightPath],
+	transformContent: false,
+	strokeWidth: 30,
+	strokeJoin: 'round',
+	strokeCap: 'butt',
+	pivot: leftPath.position,
+	position: view.center
+});
+
+function onMouseDown() {
+	flip = !flip;
+}
+
+function onKeyDown(event) {
+	if (event.key === 'space')
+		group.fullySelected = !group.fullySelected;
+}
+
+var audio, source, analyserL, analyserR, freqByteData;
+
+view.onFrame = function() {
+	var step = view.size.width / (amount + 1);
+	var scale = view.size.height / 1.75;
+	analyserL.getByteFrequencyData(freqByteData);
+	var leftBands = getEqualizerBands(freqByteData, true);
+	analyserR.getByteFrequencyData(freqByteData);
+	var rightBands = getEqualizerBands(freqByteData, true);
+	for (var i = 1; i <= amount; i++) {
+		leftPath.segments[i].point = [i * step, -leftBands[i - 1] * scale];
+		rightPath.segments[i].point = [i * step, -rightBands[i - 1] * scale * (flip ? -1 : 1)];
+	}
+	leftPath.smooth();
+	rightPath.smooth();
+	group.pivot = [leftPath.position.x, 0];
+	group.position = view.center;
+}
+
+// Pause animation until we have data
+view.pause();
+
+var AudioContext = window.AudioContext || window.webkitAudioContext;
+if (AudioContext) {
+	audio = new AudioContext();
+	source = audio.createBufferSource();
+	// Create two separate analyzers for left and right channel.
+	analyserL = audio.createAnalyser();
+	analyserL.smoothingTimeConstant = 0.25;
+	analyserL.fftSize = Math.pow(2, amount) * 2;
+	analyserR = audio.createAnalyser();
+	analyserR.smoothingTimeConstant = analyserL.smoothingTimeConstant;
+	analyserR.fftSize = analyserL.fftSize;
+	// Create the buffer to receive the analyzed data.
+	freqByteData = new Uint8Array(analyserL.frequencyBinCount);
+	// Create a splitter to feed them both
+	var splitter = audio.createChannelSplitter();
+	// Connect audio processing graph
+	source.connect(splitter);
+	splitter.connect(analyserL, 0, 0);
+	splitter.connect(analyserR, 1, 0);
+	// Connect source to output also so we can hear it
+	source.connect(audio.destination);
+	loadAudioBuffer('http://dl.dropboxusercontent.com/s/ozlvjokqu7ujjwh/gnossienne.mp3');
+} else {
+	// TODO: Print error message
+	alert('Audio not supported');
+}
+
+function loadAudioBuffer(url) {
+	// Load asynchronously
+	var request = new XMLHttpRequest();
+	request.open("GET", url, true);
+	request.responseType = "arraybuffer";
+
+	request.onload = function() { 
+		audio.decodeAudioData(
+			request.response,
+			function(buffer) {
+				source.buffer = buffer;
+				source.loop = true;
+				source.start(0);
+				view.play();
+			},
+			
+			function(buffer) {
+				alert("Error loading MP3");
+			}
+		);
+	};
+	request.send();
+}
+
+function getEqualizerBands(data) {
+	var bands = [];
+	var amount = Math.sqrt(data.length) / 2;
+	for(var i = 0; i < amount; i++) {
+		var start = Math.pow(2, i) - 1;
+		var end = start * 2 + 1;
+		var sum = 0;
+		for (var j = start; j < end; j++) {
+			sum += data[j];
+		}
+		var avg = sum / (255 * (end - start));
+		bands[i] = Math.sqrt(avg / Math.sqrt(2));
+	}
+	return bands;
+}
+</script>
+<div class="canvas">
+<canvas resize="true" id="canvas-1"></canvas>
+</div>
+</div></article>
+  </body>
+</html>
+<!-- Localized -->

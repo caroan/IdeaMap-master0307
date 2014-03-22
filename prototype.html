@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!-- Load the Paper.js library -->
+<script type="text/javascript" src="assets/js/paper.js"></script>
+<!-- Define inlined PaperScript associate it with myCanvas -->
+
+<script type="text/paperscript" canvas="myCanvas">
+
+var concept = function(label){
+	var verticalMargin = 8;
+	var horizontalMargin = 10;
+
+
+	var group = new Group();
+	var text = new PointText(new Point(0, 0));
+	text.fillColor = 'black';
+	text.content = label;
+	text.position = new Point(0,0);
+	var textWidth = text.bounds.width;
+	var textHeight = text.bounds.height;
+
+
+	console.log("Text Width:"+textWidth+" Height:"+textHeight);
+
+	var rectangleDefinition = new Rectangle(new Point(0,0), new Size(textWidth + horizontalMargin * 2,textHeight + verticalMargin * 2));
+
+	var bgRectanlge = new Shape.Rectangle(rectangleDefinition, 10);
+
+	var outlineWidth = bgRectanlge.bounds.width;
+	var outlineHeight = bgRectanlge.bounds.height;
+	bgRectanlge.fillColor = "red";
+	bgRectanlge.position = new Point(0,0);
+	group.addChild(bgRectanlge);
+
+	var borderRectanlge = new Shape.Rectangle(rectangleDefinition, 10);
+	borderRectanlge.strokeColor = 'black';
+	borderRectanlge.strokeWidth = 3;
+	borderRectanlge.position = new Point(0,0);
+	group.addChild(borderRectanlge);
+
+	group.addChild(text);
+
+	group.startDrag = function(){
+		bgRectanlge.scale(1.2);
+		borderRectanlge.scale(1.2);
+		
+	}
+
+	group.endDrag = function(){
+		bgRectanlge.bounds.width  	= 	outlineWidth;
+		bgRectanlge.bounds.height  	=	outlineHeight;
+		bgRectanlge.bounds.point 	= 	group.bounds.point;
+
+		borderRectanlge.bounds.width  	= 	outlineWidth;
+		borderRectanlge.bounds.height  	=	outlineHeight;
+		borderRectanlge.bounds.point 	= 	group.bounds.point;
+	
+	}
+
+	return group;
+};
+
+
+var layer = new Layer();
+layer.activate();
+var group1 = concept("New Idea is here");
+group1.position = new Point(150,150);
+
+var group2 = concept("Comming soon");
+group2.position = new Point(150,180);
+
+console.log("Active layer childrens:");
+console.log(project.activeLayer.children);
+var selectedGroup = null;
+
+function onMouseDown(event) {
+	console.log(event);
+	var hitResult = project.hitTest(event.downPoint,{type:"group", fill:true});
+	if (hitResult === null) {
+		if (selectedGroup == null){
+			return;
+		}
+		selectedGroup.endDrag();
+		selectedGroup = null;
+		return;
+	}
+
+	var g = hitResult.item.parent;
+	if (selectedGroup !== g ){
+		if (selectedGroup != null){
+			selectedGroup.endDrag();
+		}
+		selectedGroup = g;
+		selectedGroup.startDrag();
+	}
+	
+
+}
+
+function onMouseUp(event) {
+	
+}
+
+function onMouseDrag(event) {
+	if (selectedGroup == null){
+		return;
+	}
+
+	selectedGroup.position += event.delta;
+
+}
+
+</script>
+</head>
+<body>
+	<canvas id="myCanvas" resize="true"></canvas>
+</body>
+</html>
